@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KsTU University Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert Script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+         * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+
+body {
+    position: relative;
+    background: #f0f2f5;
+    background-image: url('../images/kstu_build.jpeg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(106, 180, 255, 0.1);
+    z-index: -1;
+}
+:root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+            
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-header-icon {
+            background: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chat-header-text h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .chat-header-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f8fafc;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 18px;
+            position: relative;
+            line-height: 1.5;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .link {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background: white;
+            color: var(--dark-color);
+            border-bottom-left-radius: 5px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .message-time {
+            display: block;
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 8px;
+        }
+        
+        .info-card {
+            background: #f1f5f9;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .info-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .info-card ul, .info-card ol {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .info-card li {
+            margin-bottom: 5px;
+        }
+        
+        .suggestions {
+            display: flex;
+            padding: 15px;
+            gap: 10px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        
+        .suggestion {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .suggestion:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .chat-input-container {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 25px;
+            outline: none;
+            font-family: 'Poppins', sans-serif;
+            transition: border 0.3s ease;
+        }
+        
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .chat-input button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .chat-input button:hover {
+            background: var(--secondary-color);
+        }
+        
+        .chat-controls {
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            gap: 15px;
+        }
+        
+        .control-btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--dark-color);
+        }
+        
+        .control-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 15px;
+            background: white;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+            align-self: flex-start;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #cbd5e1;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .follow-up-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .follow-up-option {
+            background: #e0f2fe;
+            color: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #bae6fd;
+        }
+        
+        .follow-up-option:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .chat-container {
+                height: 95vh;
+                border-radius: 15px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .suggestions {
+                flex-direction: column;
+            }
+            
+            .suggestion {
+                text-align: center;
+            }
+            
+            .follow-up-options {
+                flex-direction: column;
+            }
+        }
+        
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-header-icon">
+                <i class="fas fa-robot text-2xl text-blue-500"></i>
+            </div>
+            <div class="chat-header-text">
+                <h3>KsTU Assistant</h3>
+                <p><span class="status-indicator animate-pulse"></span> Online • Ready to help</p>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <strong>Hello! I'm the KsTU Assistant</strong><br>
+                I'm here to help you with admissions, registration, fees, timetables, and other university information. What would you like to know?
+                <span class="message-time">Just now</span>
+            </div>
+        </div>
+        
+        <div class="suggestions">
+            <div class="suggestion" onclick="sendSuggestion('How do I apply for admission?')">
+                <i class="fas fa-user-graduate"></i> Admissions
+            </div>
+            <div class="suggestion" onclick="sendSuggestion('How does course registration work?')">
+                <i class="fas fa-clipboard-list"></i> Registration
+            </div>
+            <div class="suggestion" onclick="sendSuggestion('What are the payment methods for fees?')">
+                <i class="fas fa-money-bill-wave"></i> Fees & Payment
+            </div>
+            <div class="suggestion" onclick="sendSuggestion('Where can I find exam timetables?')">
+                <i class="fas fa-calendar-alt"></i> Exam Timetables
+            </div>
+            <div class="suggestion" onclick="sendSuggestion('How do I check my results?')">
+                <i class="fas fa-chart-bar"></i> Results
+            </div>
+            <div class="suggestion" onclick="sendSuggestion('How do I apply for accommodation?')">
+                <i class="fas fa-bed"></i> Accommodation
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Type your question here..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="chat-controls">
+            <button class="control-btn" title="Home" onclick="location.href='{% url 'index' %}'">
+                <i class="fa fa-home"></i>
+            </button>
+            <button class="control-btn" title="Clear chat" onclick="clearChat()">
+                <i class="fas fa-broom"></i>
+            </button>
+            <button class="control-btn" title="Help" onclick="showHelp()">
+                <i class="fas fa-question"></i>
+            </button>
+        </div>
+    </div>
+
+    <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/68f61144f6f81d194f782149/1j80j6toa';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+</script>
+<!--End of Tawk.to Script-->
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        
+        // Track conversation context for follow-up questions
+        let conversationContext = {
+            currentTopic: null,
+            awaitingResponse: false,
+            questionType: null
+        };
+        
+        // Enhanced knowledge base for the chatbot based on the project scope
+        const knowledgeBase = {
+            // Greetings
+            greeting: ["Hello! How can I help you today?", "Hi there! What would you like to know?", "Greetings! How can I assist you?"],
+            
+            // Course Registration
+            registration: {
+                question: "Are you a fresh student or a continuing student?",
+                options: ["Fresh Student", "Continuing Student"],
+                responses: {
+                    "fresh": `<div class="info-card">
+                        <h4><strong>Course Registration for Fresh Students</strong></h4>
+                        <p>As a fresh student, you need to:</p>
+                        <ol>
+                            <li>Complete your admission acceptance process</li>
+                            <li>Pay your tuition fees (at least 60%)</li>
+                            <li>Attend the orientation program</li>
+                            <li>Visit your department for course advising</li>
+                            <li>Register for courses on the student portal <a href="https://portal.kstu.edu.gh" class="link" target="_blank">here</a> with guidance from your academic advisor</li>
+                            <li>Print your course registration form for department records</li>
+                        </ol>
+                        <p><strong>Note:</strong> Fresh students have a extended registration period of 3 weeks at the beginning of the semester.</p>
+                    </div>`,
+                    "continuing": `<div class="info-card">
+                        <h4><strong>Course Registration for Continuing Students</strong></h4>
+                        <p>As a continuing student, you should:</p>
+                        <ol>
+                            <li>Clear any outstanding fees from previous semesters</li>
+                            <li>Pay at least 60% of current semester fees</li>
+                            <li>Check your academic progress in the student portal</li>
+                            <li>Consult your program course sequence and academic advisor</li>
+                            <li>Register for courses on the student portal <a href="https://portal.kstu.edu.gh" class="link" target="_blank">here</a></li>
+                            <li>Print your course registration form</li>
+                        </ol>
+                        <p><strong>Note:</strong> Course registration for continuing students must be completed within the first two weeks of the semester.</p>
+                    </div>`
+                }
+            },
+            
+            // Fees
+            fees: {
+                question: "Are you asking about undergraduate, postgraduate, or HND fees?",
+                options: ["Undergraduate", "Postgraduate", "HND"],
+                responses: {
+                    "undergraduate": `<div class="info-card">
+                        <h4><strong>Undergraduate Fees (Per Academic Year)</strong></h4>
+                        <ul>
+                            <li>BTech. Computer Technology: GHS 3,600</li>
+                            <li>BTech. Mechanical Engineering: GHS 4,500</li>
+                            <li>BSc. Accounting: GHS 3,200</li>
+                            <li>BSc. Marketing: GHS 3,200</li>
+                            <li>BSc. Hospitality Management: GHS 4,900</li>
+                            <li>Other Business Programs: GHS 3000 - 5,000</li>
+                            <li>Other Engineering Programs: GHS 3,200 - 5,500</li>
+                        </ul>
+                        <p><strong>Note:</strong> All students must pay at least 60% of fees before registration. Additional fees may apply for specific programs.</p>
+                    </div>`,
+                    "postgraduate": `<div class="info-card">
+                        <h4><strong>Postgraduate Fees (Per Academic Year)</strong></h4>
+                        <ul>
+                            <li>MBA (Regular): GHS 7,500</li>
+                            <li>MBA (Executive): GHS 9,000</li>
+                            <li>MSc. Computer Science: GHS 7,200</li>
+                            <li>MSc. Engineering Programs: GHS 7,800</li>
+                            <li>MSc. Construction: GHS 6,500</li>
+                            <li>PhD Programs: GHS 10,000 - 12,000</li>
+                        </ul>
+                        <p><strong>Note:</strong> Postgraduate fees are payable per semester. Additional research fees may apply in the final year.</p>
+                    </div>`,
+                    "hnd": `<div class="info-card">
+                        <h4><strong>HND Fees (Per Academic Year)</strong></h4>
+                        <ul>
+                            <li>HND Accounting: GHS 3,800</li>
+                            <li>HND Marketing: GHS 3,800</li>
+                            <li>HND Mechanical Engineering: GHS 4,200</li>
+                            <li>HND Electrical Engineering: GHS 4,200</li>
+                            <li>HND Hospitality Management: GHS 3,900</li>
+                            <li>HND Computer Science: GHS 3,100</li>
+                        </ul>
+                        <p><strong>Note:</strong> HND students must pay full fees before registration. Industrial attachment fees may apply in the second year.</p>
+                    </div>`
+                }
+            },
+            
+            // Exams
+            exams: {
+                question: "Do you want the mid-semester exams or end-of-semester exams timetable?",
+                options: ["Mid-semester Exams", "End-of-semester Exams"],
+                responses: {
+                    "mid": `<div class="info-card">
+                        <h4><strong>Mid-Semester Exams Timetable</strong></h4>
+                        <p><strong>First Semester Mid-Semester Exams:</strong> normally starts in April</p>
+                        <p><strong>Second Semester Mid-Semester Exams:</strong> normally starts in July</p>
+                        <p>Mid-semester exams typically cover weeks 1-6 of lecture materials. The detailed timetable will be published on student portals and departmental notice boards two weeks before the exams.</p>
+                        <p><strong>Note:</strong> All mid-semester exams count for 40% of your final course grade.</p>
+                    </div>`,
+                    "end": `<div class="info-card">
+                        <h4><strong>End-of-Semester Exams Timetable</strong></h4>
+                        <p><strong>First Semester Exams:</strong> normally starts in early May</p>
+                        <p><strong>Second Semester Exams:</strong> normally starts in late July</p>
+                        <p>End-of-semester exams cover the entire semester's work. The detailed timetable will be published on student portals and departmental notice boards three weeks before the exams.</p>
+                        <p><strong>Note:</strong> You must have at least 60% class attendance and be fee-compliant to be eligible for exams.</p>
+                    </div>`
+                }
+            },
+            
+            // Results
+            results: {
+                question: "Do you want to check results on the student portal or request a hard copy transcript?",
+                options: ["Student Portal", "Hard Copy Transcript"],
+                responses: {
+                    "portal": `<div class="info-card">
+                        <h4><strong>Checking Results on Student Portal</strong></h4>
+                        <p>To check your results on the student portal:</p>
+                        <ol>
+                            <li>Log in to the KsTU Student Portal at <a href="https://portal.kstu.edu.gh" class="link" target="_blank">portal.kstu.edu.gh</a></li>
+                            <li>Enter your student ID and password</li>
+                            <li>Navigate to the "Statement of Results" section</li>              
+                            <li>Your results will be displayed with GPA and CGPA calculations</li>
+                        </ol>
+                        <p><strong>Note:</strong> Results are typically released 2-3 weeks after the end of exams. Contact your department if results are missing.</p>
+                    </div>`,
+                    "transcript": `<div class="info-card">
+                        <h4><strong>Requesting Hard Copy Transcript</strong></h4>
+                        <p>To request an official transcript:</p>
+                        <ol>
+                            <li>Visit your Department</li>
+                            <li>Complete the transcript request form</li>
+                            <li>Pay the required transcript fee (GHS 50 for regular processing, GHS 100 for expedited)</li>
+                            <li>Provide a valid ID and student ID number</li>
+                            <li>Submit the form and payment receipt to the Department's Office</li>
+                        </ol>
+                        <p><strong>Processing Time:</strong> Regular processing takes 7-10 working days. Expedited processing takes 2-3 working days.</p>
+                        <p><strong>Contact:</strong> registrar@kstu.edu.gh | +233 (0) 322 022 388</p>
+                    </div>`
+                }
+            },
+            
+            // Accommodation
+            accommodation: {
+                question: "Are you applying for an on-campus hostel or off-campus hostel?",
+                options: ["On-campus Hostel", "Off-campus Hostel"],
+                responses: {
+                    "on-campus": `<div class="info-card">
+                        <h4><strong>On-Campus Hostel Application</strong></h4>
+                        <p>To apply for on-campus accommodation:</p>
+                        <ol>
+                            <li>Log in to the student portal during the hostel application period</li>
+                            <li>Navigate to the "Accommodation" section</li>
+                            <li>Select your preferred hostel (male or female)</li>
+                            <li>Choose your room preference (single, double, or triple occupancy)</li>
+                            <li>Pay the hostel fee (GHS 3200 -3800 per academic year depending on room type)</li>
+                            <li>Print the hostel allocation letter</li>
+                        </ol>
+                        <p><strong>Note:</strong> Hostel allocation is based on first-come, first-served basis. Priority is given to fresh students.</p>
+                        <p><strong>Application Period:</strong> Opens two weeks before semester begins.</p>
+                    </div>`,
+                    "off-campus": `<div class="info-card">
+                        <h4><strong>Off-Campus Hostel Information</strong></h4>
+                        <p>The University has accredited off-campus hostels for students:</p>
+                        <ul>
+                            <li><strong>University Accreditated Hostels:</strong> These are privately-owned hostels approved by the University</li>
+                            <li><strong>Rental Assistance:</strong> The Student Affairs Office can provide guidance on finding accommodation</li>
+                        </ul>
+                        <p><strong>Steps to secure off-campus accommodation:</strong></p>
+                        <ol>
+                            <li>Visit the Student Affairs Office for a list of accredited hostels</li>
+                            <li>Contact hostel managers directly to check availability</li>
+                            <li>Inspect the facility before making any payments</li>
+                            <li>Sign a rental agreement and keep a copy</li>
+                            <li>Register your accommodation details with the Student Affairs Office</li>
+                        </ol>
+                        <p><strong>Average Rent:</strong> GHS 250-600 per month depending on location and facilities.</p>
+                    </div>`
+                }
+            },
+            
+            // Library Access
+            library: {
+                question: "Do you mean the physical library or the online/e-library?",
+                options: ["Physical Library", "Online/E-Library"],
+                responses: {
+                    "physical": `<div class="info-card">
+                        <h4><strong>Physical Library Access</strong></h4>
+                        <p>To access the physical library:</p>
+                        <ol>
+                            <li>Present your valid student ID card at the entrance</li>
+                            <li>Register at the front desk if it's your first visit</li>
+                            <li>Follow the library rules and regulations</li>
+                            <li>Books can be borrowed for up to 2 weeks (renewable once)</li>
+                            <li>Reference materials and periodicals are for in-library use only</li>
+                        </ol>
+                        <p><strong>Library Hours:</strong></p>
+                        <ul>
+                            <li>Monday-Friday: 8:00 AM - 8:00 PM</li>
+                            <li>Saturday: 9:00 AM - 4:00 PM</li>
+                            <li>Sunday: 1:00 PM - 5:00 PM</li>
+                        </ul>
+                        <p><strong>Note:</strong> Extended hours during examination periods (open until 10:00 PM).</p>
+                    </div>`,
+                    "online": `<div class="info-card">
+                        <h4><strong>Online/E-Library Access</strong></h4>
+                        <p>To access the online library resources:</p>
+                        <ol>
+                            <li>Visit the library website: <a href="https://library.kstu.edu.gh" class="link" target="_blank">library.kstu.edu.gh</a></li>
+                            <li>Use your student portal credentials to log in</li>
+                            <li>Access e-books, journals, and research databases</li>
+                            <li>Use the search function to find specific resources</li>
+                            <li>Download materials or read online</li>
+                        </ol>
+                        <p><strong>Available Resources:</strong></p>
+                        <ul>
+                            <li>Over 50,000 e-books across various disciplines</li>
+                            <li>Access to academic journals (JSTOR, ScienceDirect, etc.)</li>
+                            <li>Past project works and theses</li>
+                            <li>Research guides and citation tools</li>
+                        </ul>
+                        <p><strong>Note:</strong> Some resources may require VPN access when off-campus. Contact library staff for assistance.</p>
+                    </div>`
+                }
+            },
+            
+            // Graduation
+            graduation: {
+                question: "Are you asking about academic requirements (credits completed) or administrative requirements (clearance, fees, etc.)?",
+                options: ["Academic Requirements", "Administrative Requirements"],
+                responses: {
+                    "academic": `<div class="info-card">
+                        <h4><strong>Academic Requirements for Graduation</strong></h4>
+                        <p>To be eligible for graduation, students must:</p>
+                        <ol>
+                            <li>Complete all required courses for their program</li>
+                            <li>Earn the minimum number of credit hours:
+                                <ul>
+                                    <li>Undergraduate: 120-144 credits depending on program</li>
+                                    <li>Postgraduate: 36-48 credits depending on program</li>
+                                    <li>HND: 80-96 credits depending on program</li>
+                                </ul>
+                            </li>
+                            <li>Achieve a minimum CGPA of 1.5 for undergraduate programs</li>
+                            <li>Complete all practical attachments/internships if required by program</li>
+                            <li>Successfully complete and defend final year project (if applicable)</li>
+                        </ol>
+                        <p><strong>Note:</strong> Specific program requirements may vary. Consult your department for detailed information.</p>
+                    </div>`,
+                    "administrative": `<div class="info-card">
+                        <h4><strong>Administrative Requirements for Graduation</strong></h4>
+                        <p>Administrative requirements include:</p>
+                        <ol>
+                            <li>Clear all outstanding tuition and other fees</li>
+                            <li>Complete the graduation application form during the specified period</li>
+                            <li>Return all library books and settle any library fines</li>
+                            <li>Return laboratory equipment and clear with department</li>
+                            <li>Complete the exit clearance form signed by all relevant departments</li>
+                            <li>Pay graduation fee (GHS 550 for undergraduate, GHS 650 for postgraduate)</li>
+                            <li>Submit passport photographs for graduation album</li>
+                        </ol>
+                        <p><strong>Graduation Application Period:</strong> Typically opens 2 months before the graduation ceremony.</p>
+                    </div>`
+                }
+            },
+            
+            // Support (Technical Issues)
+            support: {
+                question: "Are you seeing an 'invalid password' error or 'account locked' error?",
+                options: ["Invalid Password", "Account Locked"],
+                responses: {
+                    "password": `<div class="info-card">
+                        <h4><strong>Invalid Password Error</strong></h4>
+                        <p>If you're seeing an 'invalid password' error:</p>
+                        <ol>
+                            <li>Ensure Caps Lock is not accidentally enabled</li>
+                            <li>Try resetting your password using the 'Forgot Password' link on the login page</li>
+                            <li>Check your registered phone number for password reset token</li>
+                            <li>If you don't receive the reset token, check your phone's messaging app</li>
+                            <li>Contact ICT Directorate if you no longer have access to your registered phone number</li>
+                        </ol>
+                        <p><strong>ICT Directorate Contact:</strong></p>
+                        <ul>
+                            <li>Email: helpdesk@kstu.edu.gh</li>
+                            <li>Phone: +233 (0) 322 022 388</li>
+                            <li>Location: MP Block, Basement</li>
+                            <li>Hours: Monday-Friday, 8:00 AM - 5:00 PM</li>
+                        </ul>
+                    </div>`,
+                    "locked": `<div class="info-card">
+                        <h4><strong>Account Locked Error</strong></h4>
+                        <p>If your account is locked due to multiple failed login attempts:</p>
+                        <ol>
+                            <li>Wait for 30 minutes as accounts are automatically unlocked after this period</li>
+                            <li>Visit the ICT Directorate in person with your student ID card</li>
+                            <li>Fill out an account unlock request form</li>
+                            <li>Your account will be unlocked within 24 hours</li>
+                            <li>You'll be required to set a new password after unlocking</li>
+                        </ol>
+                        <p><strong>To prevent future lockouts:</strong></p>
+                        <ul>
+                            <li>Use a password you can remember easily</li>
+                            <li>Consider using a password manager</li>
+                            <li>Avoid sharing your login credentials</li>
+                            <li>Log out properly after each session</li>
+                        </ul>
+                    </div>`
+                }
+            },
+            
+            // Academic Calendar
+            academicCalendar: `<div class="info-card">
+                <h4><strong>Academic Calendar 2023/2024</strong></h4>
+                <p><strong>First Semester:</strong></p>
+                <ul>
+                    <li>Orientation for Fresh Students: January each year</li>
+                    <li>Lectures Begin: Second week of January each year</li>
+                    <li>Mid-Semester Exams: March each year</li>
+                    <li>Lectures End: April each year</li>
+                    <li>Revision Week: Last week of April each year</li>
+                    <li>End of Semester Exams: April - May each year</li>
+                </ul>
+                <p><strong>Second Semester:</strong></p>
+                <ul>
+                    <li>Lectures Begin: June each year</li>
+                    <li>Mid-Semester Exams: July each year</li>
+                    <li>Lectures End: August each year</li>
+                    <li>Revision Week: August each year</li>
+                    <li>End of Semester Exams: September each year</li>
+                </ul>
+                <p><strong>Note:</strong> Dates are subject to change. Check the official university website for updates.</p>
+            </div>`,
+            
+            // Courses and Lecturers
+            coursesLecturers: `<div class="info-card">
+                <h4><strong>Courses and Assigned Lecturers</strong></h4>
+                <p>To find information about courses and assigned lecturers:</p>
+                <ol>
+                    <li>Log in to the student portal</li>
+                    <li>Navigate to the "Academic" section</li>
+                    <li>Select "Course Registration" or "Course Information"</li>
+                    <li>View the list of courses for your program</li>
+                    <li>Click on each course to see details including assigned lecturers</li>
+                    <li>Alternatively, check your department's notice board for course allocations</li>
+                </ol>
+                <p><strong>Departmental Contacts for Course Information:</strong></p>
+                <ul>
+                    <li>Computer Science: cs@kstu.edu.gh</li>
+                    <li>Engineering: engineering@kstu.edu.gh</li>
+                    <li>Business: business@kstu.edu.gh</li>
+                    <li>Applied Sciences: appliedsciences@kstu.edu.gh</li>
+                </ul>
+                <p><strong>Note:</strong> Course allocations may change at the beginning of each semester. Verify with your department.</p>
+            </div>`,
+            
+            // University Contact Information
+            contact: `<div class="info-card">
+                <h4><strong>University Contact Information</strong></h4>
+                <p><strong>Main Contact:</strong></p>
+                <ul>
+                    <li>Address: P.O. Box 854, Kumasi, Ghana</li>
+                    <li>Phone: +233 (0) 322 496 534</li>
+                    <li>Email: info@kstu.edu.gh</li>
+                    <li>Website: <a href="https://kstu.edu.gh" class="link" target="_blank">www.kstu.edu.gh</a></li>
+                </ul>
+                <p><strong>Key Departments:</strong></p>
+                <ul>
+                    <li>Admissions: admissions@kstu.edu.gh</li>
+                    <li>Registrar's Office: registrar@kstu.edu.gh</li>
+                    <li>Academic Affairs: academic@kstu.edu.gh</li>
+                    <li>Finance: finance@kstu.edu.gh</li>
+                    <li>Student Affairs: studentaffairs@kstu.edu.gh</li>
+                    <li>ICT Directorate: ict@kstu.edu.gh</li>
+                    <li>Library: library@kstu.edu.gh</li>
+                </ul>
+                <p><strong>Office Hours:</strong> Monday-Friday, 8:00 AM - 5:00 PM</p>
+            </div>`,
+            
+            // Admissions
+            admissions: `<div class="info-card">
+                <h4><strong>KsTU Admissions Process</strong></h4>
+                <p>KsTU offers admissions for various programs. The process includes:</p>
+                <ol>
+                    <li>Purchase online admissions voucher of GHS 200 (undergraduate) or 220 (Postgraduate)</li>
+                    <li>Complete online application form</li>
+                    <li>Submit required documents (WASSCE/SSSCE results, Transcript, birth certificate, etc.)</li>
+                    <li>Check admission status online</li>
+                </ol>
+                <p>Application deadlines: Undergraduate - July 31, Postgraduate - June 30</p>
+                <p><strong>Contact:</strong> admissions@kstu.edu.gh | +233 (0) 322 496 534</p>
+            </div>`,
+            
+            // Default response
+            default: `<div class="info-card">
+                <h4><strong>Need More Help?</strong></h4>
+                <p>I'm still learning and don't have that info yet. Please contact our team for help:</p>
+                <p><strong>Main Office:</strong> +233 (0) 322 496 534</p>
+                <p><strong>Email:</strong> info@kstu.edu.gh</p>
+                <p><strong>Website:</strong> <a href="https://kstu.edu.gh/" target="_blank" style="color: #2563eb; text-decoration: underline;">www.kstu.edu.gh</a></p>
+                <p>Office hours: Monday-Friday, 8:00 AM - 5:00 PM</p>
+            </div>`
+        };
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === "") return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            userInput.value = "";
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Process message after a short delay to simulate thinking
+            setTimeout(() => {
+                removeTypingIndicator();
+                
+                // Check if we're in the middle of a conversation with a specific context
+                if (conversationContext.awaitingResponse) {
+                    handleFollowUpResponse(message);
+                } else {
+                    const response = generateResponse(message);
+                    addMessage(response, 'bot');
+                }
+                
+                // Save chat history
+                saveChatHistory();
+            }, 1500);
+        }
+        
+        function sendSuggestion(suggestion) {
+            userInput.value = suggestion;
+            sendMessage();
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add(sender + '-message');
+            
+            if (sender === 'bot' && text.includes('info-card')) {
+                messageElement.innerHTML = text + '<span class="message-time">' + getCurrentTime() + '</span>';
+            } else {
+                // Preserve line breaks in response text
+                const formattedText = text.replace(/\n/g, '<br>');
+                messageElement.innerHTML = formattedText + '<span class="message-time">' + getCurrentTime() + '</span>';
+            }
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            const typingElement = document.createElement('div');
+            typingElement.classList.add('typing-indicator');
+            typingElement.id = 'typingIndicator';
+            typingElement.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+            chatMessages.appendChild(typingElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const typingElement = document.getElementById('typingIndicator');
+            if (typingElement) {
+                typingElement.remove();
+            }
+        }
+        
+        function generateResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Check for greetings
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey') || lowerMessage.includes('good day')) {
+                return knowledgeBase.greeting[Math.floor(Math.random() * knowledgeBase.greeting.length)];
+            }
+            
+            // Check for course registration
+            if (lowerMessage.includes('register') || lowerMessage.includes('registration') || 
+                lowerMessage.includes('course registration') || lowerMessage.includes('enroll') || 
+                lowerMessage.includes('enrollment') || lowerMessage.includes('add course') || 
+                lowerMessage.includes('drop course') || lowerMessage.includes('change course')) {
+                conversationContext.currentTopic = 'registration';
+                conversationContext.awaitingResponse = true;
+                return askFollowUpQuestion(knowledgeBase.registration);
+            }
+            
+            // Check for fees
+            if (lowerMessage.includes('fee') || lowerMessage.includes('fees') || lowerMessage.includes('payment') || 
+                lowerMessage.includes('pay') || lowerMessage.includes('tuition') || lowerMessage.includes('cost') || 
+                lowerMessage.includes('money') || lowerMessage.includes('how much') || lowerMessage.includes('amount')) {
+                conversationContext.currentTopic = 'fees';
+                conversationContext.awaitingResponse = true;
+                return askFollowUpQuestion(knowledgeBase.fees);
+            }
+            
+            // Check for exams
+            if (lowerMessage.includes('exam') || lowerMessage.includes('exams') || lowerMessage.includes('timetable') || 
+                lowerMessage.includes('schedule') || lowerMessage.includes('when is exam') || 
+                lowerMessage.includes('exam date') || lowerMessage.includes('exam period')) {
+                conversationContext.currentTopic = 'exams';
+                conversationContext.awaitingResponse = true;
+                return askFollowUpQuestion(knowledgeBase.exams);
+            }
+            
+            // Check for results
+            if (lowerMessage.includes('result') || lowerMessage.includes('results') || lowerMessage.includes('grade') || 
+                lowerMessage.includes('grades') || lowerMessage.includes('transcript') || lowerMessage.includes('gpa') || 
+                lowerMessage.includes('cgpa') || lowerMessage.includes('check my result')) {
+                conversationContext.currentTopic = 'results';
+                conversationContext.awaitingResponse = true;
+                return askFollowUpQuestion(knowledgeBase.results);
+            }
+            
+            // Check for accommodation
+            if (lowerMessage.includes('accommodation') || lowerMessage.includes('hostel') || lowerMessage.includes('housing') || 
+                lowerMessage.includes('residence') || lowerMessage.includes('dorm') || lowerMessage.includes('lodging') || 
+                lowerMessage.includes('apply for hostel') || lowerMessage.includes('where will i stay')) {
+                conversationContext.currentTopic = 'accommodation';
+                conversationContext.awaitingResponse = true;
+                return askFollowUpQuestion(knowledgeBase.accommodation);
+            }
+            
+            // Check for library
+            if (lowerMessage.includes('library') || lowerMessage.includes('e-library') || lowerMessage.includes('e-library') || 
+                lowerMessage.includes('books') || lowerMessage.includes('research') || lowerMessage.includes('study') || 
+                lowerMessage.includes('access library') || lowerMessage.includes('library resources')) {
+                conversationContext.currentTopic = 'library';
+                conversationContext.awaitingResponse = true;
+                return askFollowUpQuestion(knowledgeBase.library);
+            }
+            
+            // Check for graduation
+            if (lowerMessage.includes('graduation') || lowerMessage.includes('graduate') || lowerMessage.includes('convocation') || 
+                lowerMessage.includes('completing') || lowerMessage.includes('finish') || lowerMessage.includes('requirements to graduate') || 
+                lowerMessage.includes('when can i graduate')) {
+                conversationContext.currentTopic = 'graduation';
+                conversationContext.awaitingResponse = true;
+                return askFollowUpQuestion(knowledgeBase.graduation);
+            }
+            
+            // Check for support/technical issues
+            if (lowerMessage.includes('login') || lowerMessage.includes('log in') || lowerMessage.includes('portal') || 
+                lowerMessage.includes('password') || lowerMessage.includes('account') || lowerMessage.includes('technical') || 
+                lowerMessage.includes('problem') || lowerMessage.includes('error') || lowerMessage.includes('can\'t access')) {
+                conversationContext.currentTopic = 'support';
+                conversationContext.awaitingResponse = true;
+                return askFollowUpQuestion(knowledgeBase.support);
+            }
+            
+            // Check for academic calendar
+            if (lowerMessage.includes('academic calendar') || lowerMessage.includes('semester dates') || 
+                lowerMessage.includes('when does semester start') || lowerMessage.includes('when does semester end') || 
+                lowerMessage.includes('school calendar') || lowerMessage.includes('academic schedule')) {
+                return knowledgeBase.academicCalendar;
+            }
+            
+            // Check for courses and lecturers
+            if (lowerMessage.includes('course') || lowerMessage.includes('lecturer') || lowerMessage.includes('professor') || 
+                lowerMessage.includes('instructor') || lowerMessage.includes('teacher') || lowerMessage.includes('who teaches')) {
+                return knowledgeBase.coursesLecturers;
+            }
+            
+            // Check for contact information
+            if (lowerMessage.includes('contact') || lowerMessage.includes('email') || lowerMessage.includes('phone') || 
+                lowerMessage.includes('address') || lowerMessage.includes('location') || lowerMessage.includes('how to reach')) {
+                return knowledgeBase.contact;
+            }
+            
+            // Check for admissions
+            if (lowerMessage.includes('admission') || lowerMessage.includes('apply') || lowerMessage.includes('application') || 
+                lowerMessage.includes('requirement') || lowerMessage.includes('deadline') || lowerMessage.includes('admit')) {
+                return knowledgeBase.admissions;
+            }
+            
+            // Default response for unrecognized queries
+            return knowledgeBase.default;
+        }
+        
+        function askFollowUpQuestion(topic) {
+            let response = topic.question;
+            
+            // Add options as interactive buttons
+            response += `<div class="follow-up-options">`;
+            topic.options.forEach(option => {
+                const key = option.toLowerCase().replace(/\s+/g, '-');
+                response += `<div class="follow-up-option" onclick="handleOptionClick('${key}')">${option}</div>`;
+            });
+            response += `</div>`;
+            
+            return response;
+        }
+        
+        function handleOptionClick(option) {
+            // Simulate user clicking on the option
+            userInput.value = option;
+            sendMessage();
+        }
+        
+        function handleFollowUpResponse(message) {
+            const topic = conversationContext.currentTopic;
+            const lowerMessage = message.toLowerCase();
+            
+            let response = knowledgeBase.default;
+            
+            // Handle responses based on the current topic
+            if (topic === 'registration') {
+                if (lowerMessage.includes('fresh') || lowerMessage.includes('new')) {
+                    response = knowledgeBase.registration.responses.fresh;
+                } else if (lowerMessage.includes('continuing') || lowerMessage.includes('returning')) {
+                    response = knowledgeBase.registration.responses.continuing;
+                } else {
+                    response = "I'm not sure I understand. Are you a fresh student or a continuing student?";
+                    response += askFollowUpQuestion(knowledgeBase.registration);
+                    return addMessage(response, 'bot');
+                }
+            } 
+            else if (topic === 'fees') {
+                if (lowerMessage.includes('under')) {
+                    response = knowledgeBase.fees.responses.undergraduate;
+                } else if (lowerMessage.includes('post') || lowerMessage.includes('grad')) {
+                    response = knowledgeBase.fees.responses.postgraduate;
+                } else if (lowerMessage.includes('hnd')) {
+                    response = knowledgeBase.fees.responses.hnd;
+                } else {
+                    response = "I'm not sure I understand. Are you asking about undergraduate, postgraduate, or HND fees?";
+                    response += askFollowUpQuestion(knowledgeBase.fees);
+                    return addMessage(response, 'bot');
+                }
+            }
+            else if (topic === 'exams') {
+                if (lowerMessage.includes('mid') || lowerMessage.includes('middle')) {
+                    response = knowledgeBase.exams.responses.mid;
+                } else if (lowerMessage.includes('end') || lowerMessage.includes('final')) {
+                    response = knowledgeBase.exams.responses.end;
+                } else {
+                    response = "I'm not sure I understand. Do you want the mid-semester exams or end-of-semester exams timetable?";
+                    response += askFollowUpQuestion(knowledgeBase.exams);
+                    return addMessage(response, 'bot');
+                }
+            }
+            else if (topic === 'results') {
+                if (lowerMessage.includes('portal') || lowerMessage.includes('online') || lowerMessage.includes('student portal')) {
+                    response = knowledgeBase.results.responses.portal;
+                } else if (lowerMessage.includes('transcript') || lowerMessage.includes('hard copy') || lowerMessage.includes('physical')) {
+                    response = knowledgeBase.results.responses.transcript;
+                } else {
+                    response = "I'm not sure I understand. Do you want to check results on the student portal or request a hard copy transcript?";
+                    response += askFollowUpQuestion(knowledgeBase.results);
+                    return addMessage(response, 'bot');
+                }
+            }
+            else if (topic === 'accommodation') {
+                if (lowerMessage.includes('on-campus') || lowerMessage.includes('on campus') || lowerMessage.includes('university hostel')) {
+                    response = knowledgeBase.accommodation.responses['on-campus'];
+                } else if (lowerMessage.includes('off-campus') || lowerMessage.includes('off campus') || lowerMessage.includes('private')) {
+                    response = knowledgeBase.accommodation.responses['off-campus'];
+                } else {
+                    response = "I'm not sure I understand. Are you applying for an on-campus hostel or off-campus hostel?";
+                    response += askFollowUpQuestion(knowledgeBase.accommodation);
+                    return addMessage(response, 'bot');
+                }
+            }
+            else if (topic === 'library') {
+                if (lowerMessage.includes('physical') || lowerMessage.includes('building') || lowerMessage.includes('visit')) {
+                    response = knowledgeBase.library.responses.physical;
+                } else if (lowerMessage.includes('online') || lowerMessage.includes('e-library') || lowerMessage.includes('digital')) {
+                    response = knowledgeBase.library.responses.online;
+                } else {
+                    response = "I'm not sure I understand. Do you mean the physical library or the online/e-library?";
+                    response += askFollowUpQuestion(knowledgeBase.library);
+                    return addMessage(response, 'bot');
+                }
+            }
+            else if (topic === 'graduation') {
+                if (lowerMessage.includes('academic') || lowerMessage.includes('credit') || lowerMessage.includes('cgpa') || lowerMessage.includes('course')) {
+                    response = knowledgeBase.graduation.responses.academic;
+                } else if (lowerMessage.includes('administrative') || lowerMessage.includes('clearance') || lowerMessage.includes('fee') || lowerMessage.includes('form')) {
+                    response = knowledgeBase.graduation.responses.administrative;
+                } else {
+                    response = "I'm not sure I understand. Are you asking about academic requirements (credits completed) or administrative requirements (clearance, fees, etc.)?";
+                    response += askFollowUpQuestion(knowledgeBase.graduation);
+                    return addMessage(response, 'bot');
+                }
+            }
+            else if (topic === 'support') {
+                if (lowerMessage.includes('password') || lowerMessage.includes('invalid')) {
+                    response = knowledgeBase.support.responses.password;
+                } else if (lowerMessage.includes('locked') || lowerMessage.includes('blocked')) {
+                    response = knowledgeBase.support.responses.locked;
+                } else {
+                    response = "I'm not sure I understand. Are you seeing an 'invalid password' error or 'account locked' error?";
+                    response += askFollowUpQuestion(knowledgeBase.support);
+                    return addMessage(response, 'bot');
+                }
+            }
+            
+            // Reset conversation context
+            conversationContext.awaitingResponse = false;
+            conversationContext.currentTopic = null;
+            
+            addMessage(response, 'bot');
+        }
+        
+        function getCurrentTime() {
+            const now = new Date();
+            return now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+        }
+        
+        function saveChatHistory() {
+            localStorage.setItem('kstuChatHistory', chatMessages.innerHTML);
+        }
+        
+        function clearChat() {
+            Swal.fire({
+                title: 'Clear Chat?',
+                text: "Do you want to clear the chat history?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, clear it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Clear the chat messages
+                    chatMessages.innerHTML = '';
+                    // Reset conversation context
+                    conversationContext.awaitingResponse = false;
+                    conversationContext.currentTopic = null;
+                    saveChatHistory();
+                    addMessage(`<strong>Hello! I'm the KsTU Assistant</strong><br>I'm here to help you with admissions, registration, fees, timetables, and other university information. What would you like to know?`, 'bot');
+                }
+            });
+        }
+        
+        function showHelp() {
+            const helpMessage = `<div class="info-card">
+                <h4>How can I help you?</h4>
+                <p>I can provide information about:</p>
+                <ul>
+                    <li>Admissions process and requirements</li>
+                    <li>Course registration procedures</li>
+                    <li>Tuition fees and payment methods</li>
+                    <li>Class and examination timetables</li>
+                    <li>Academic calendar dates</li>
+                    <li>Courses and assigned lecturers</li>
+                    <li>University contact information</li>
+                    <li>Hall and hostel residence issues</li>
+                    <li>Library access (physical and online)</li>
+                    <li>Graduation requirements</li>
+                    <li>Technical support for student portal</li>
+                    <li>Results checking and transcripts</li>
+                </ul>
+                <p>Try asking about any of these topics!</p>
+            </div>`;
+            addMessage(helpMessage, 'bot');
+            saveChatHistory();
+        }
+        
+        // Load chat history from localStorage if available
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedChat = localStorage.getItem('kstuChatHistory');
+            if (savedChat) {
+                // Clear the initial bot message if we have saved history
+                if (chatMessages.children.length > 0) {
+                    chatMessages.innerHTML = '';
+                }
+                chatMessages.innerHTML = savedChat;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
